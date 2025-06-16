@@ -1,0 +1,67 @@
+# include "minishell.h"
+
+void	ft_char(char number, long i, long nbr, char *str)
+{
+	while (nbr > 0)
+	{
+		number = (nbr % 10) + '0';
+		str[i] = number;
+		i--;
+		nbr /= 10;
+	}
+}
+
+int	ft_length(long n)
+{
+	int	len;
+
+	len = 0;
+	if (n == 0)
+		return (1);
+	if (n > 0)
+	{
+		while (n > 0)
+		{
+			n = n / 10;
+			len ++;
+		}
+	}
+	if (n < 0)
+	{
+		len = 1;
+		n = -1 * n;
+		while (n > 0)
+		{
+			n = n / 10;
+			len ++;
+		}
+	}
+	return (len);
+}
+
+char	*ft_itoa(int n)
+{
+	char	*str;
+	long	i;
+	long	len;
+	long	nbr;
+	char	number;
+
+	nbr = n;
+	len = ft_length(nbr);
+	i = len - 1;
+	number = 0;
+	str = malloc((len + 1) * sizeof(char));
+	if (!str)
+		return (0);
+	if (nbr == 0)
+		str[0] = '0';
+	if (nbr < 0)
+	{
+		str[0] = '-';
+		nbr = -1 * nbr;
+	}
+	ft_char(number, i, nbr, str);
+	str[len] = '\0';
+	return (str);
+}
