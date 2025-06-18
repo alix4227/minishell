@@ -1,5 +1,16 @@
 # include "minishell.h"
 
+int	is_chevrons(t_data *data)
+{
+	if (ft_strcmp(data->back->word, ">") == 0)
+		return (1);
+	if (ft_strcmp(data->back->word, ">>") == 0)
+		return (1);
+	if (ft_strcmp(data->back->word, "<") == 0)
+		return (1);
+	return (0);
+}
+
 int	is_cmd(char *word, t_data *data)
 {
 	char	*path;
@@ -10,8 +21,11 @@ int	is_cmd(char *word, t_data *data)
 	int		j;
 	struct 	stat check;
 
+	
 	path = getenv("PATH");
 	i = 0;
+	if (data->back && is_chevrons(data))
+		return (0);
 	if (access(word, X_OK) == 0)
 	{
 		if (stat(word, &check) == 0)

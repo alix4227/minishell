@@ -5,40 +5,14 @@ void	print_list(t_list *list, char *args)
 	t_data *data;
 	int	i;
 	int j;
-	
-	if (!list->begin || is_error(args))
+	data = list->begin;
+	if (!list->begin || is_error(args) ||is_unclosed_quotes(args))
 	{
 		g_r_code = 0;
 		return ;
 	}
-	data = list->begin;
-	// while (data)
-	// {
-	// 	i = 0;
-	// 	if (ft_strcmp(data->type, "CMD") == 0)
-	// 	{
-	// 		while (data->args[i] != NULL)
-	// 		{
-	// 			j = 0;
-	// 			while (data->args[i][j])
-	// 			{
-	// 				printf("%c", data->args[i][j]);
-	// 				j++;
-	// 			}
-	// 			printf("\n");
-	// 			i++;
-	// 		}
-	// 	}
-	// 	data = data->next;
-	// }
-	// while (data)
-	// {
-		// printf("%s\n", data->type);
-		// printf("%d\n", ind);
-		printf("bash: %s: command not found", data->word);
-		g_r_code = 127;
-		// data = data->next;
-	// }
+	printf("bash: %s: command not found", data->word);
+	g_r_code = 127;
 	printf("\n");
 }
 
@@ -123,10 +97,8 @@ int	is_error(char *args)
 	i = 0;
 	while (args[i])
 	{
-		if ((args[i] == '!' || args[i] == ':') && args[i + 1] == '\0')
+		if ((args[0] == '!' || args[0] == ':') && args[1] == '\0')
 			return (1);
-		// if (is_chevron(args))
-		// 	return (1);
 		i++;
 	}
 	return (0);
@@ -137,7 +109,7 @@ int	check_file_after_redirin(t_data *data)
 	struct stat sb;
 	if (ft_strcmp(data->type, "REDIR_IN") == 0)
 	{
-		if (data->next && ft_strcmp(data->next->type, "ARG") == 0)
+		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
 		{
 			if (stat(data->next->word, &sb) == 0 &&
 				S_ISREG(sb.st_mode) &&
@@ -164,7 +136,7 @@ int	check_file_after_redirout(t_data *data)
 {
 	if (ft_strcmp(data->type, "REDIR_OUT") == 0 || ft_strcmp(data->type, "REDIR_OUT_APPEND") == 0)
 	{
-		if (data->next && ft_strcmp(data->next->type, "ARG") == 0)
+		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
 			return (0);
 		printf("bash: syntax error near unexpected token\n");
 		return (1);
@@ -187,12 +159,9 @@ int	pipe_not_followed_by_cmd(t_data *data)
 
 int	check_delim_after_heredoc(t_data *data)
 {
-	char *heredoc;
-
-	heredoc = data->word;
 	if (ft_strcmp(data->type, "HEREDOC") == 0)
 	{
-		if (data->next && ft_strcmp(data->next->type, "ARG") == 0)
+		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
 			return (0);
 		printf("bash: syntax error near unexpected token\n");
 		return (1);
@@ -223,6 +192,28 @@ int	is_error_2(t_data *data, t_list *list)
 	return (0);
 }
 
+int	is_unclosed_quotes(char *args)
+{
+	int	i;
+	int count;
+
+	i = 0;
+	count = 0;
+	while (args[i])
+	{
+		if (args[i] == '\'')
+			count += 1;
+		if (count == 2)
+			count = 0;
+		i++;
+	}
+	if (count != 0)
+		return (1);
+	else
+		return (0);
+
+}
+
 int	main(int ac, char **av, char **env)
 {
 	t_list *list;
@@ -249,13 +240,13 @@ int	main(int ac, char **av, char **env)
 		global.index++;
 		get_word(list, args, data, global);
 		get_type(data, list);
+		get_file(list);
 		if (is_error_2(data, list))
 		{
 			free_list(list);
 			signal_handlers(global);
 			continue ;
 		}
-		get_file(list);
 		get_args_cmd(data, list);
 		data = list->begin;
 		while (data)

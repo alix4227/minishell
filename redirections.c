@@ -135,7 +135,7 @@ void	search_redir(t_data * data)
 
 void	is_redir_start(t_data * data)
 {
-	if (ft_strcmp(data->type, "REDIR_OUT") == 0)
+	if (ft_strcmp(data->type, "REDIR_IN") == 0)
 		ft_redir_in(data);
 	else if (ft_strcmp(data->type, "REDIR_OUT") == 0)
 		ft_redir_out(data);

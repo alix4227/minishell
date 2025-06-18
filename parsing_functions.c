@@ -42,10 +42,12 @@ void	single_quote_pars(t_data *data, char *args)
 	data->i++;
 	while (args[data->i] && args[data->i] != '\'')
 		data->retour[data->j++] = args[data->i++];
+	if (args[data->i == 1] == '\'')
+		data->retour[data->j++] = ' ';
 	if (args[data->i] == '\'')
 		data->i++;
 	else
-		exit (1);
+		return ;
 }
 
 void	double_quotes_pars(t_data *data, char *args)
@@ -58,10 +60,13 @@ void	double_quotes_pars(t_data *data, char *args)
 		else
 			data->retour[data->j++] = args[data->i++];
 	}
+	if (args[data->i == 1] == '"')
+		data->retour[data->j++] = ' ';
 	if (args[data->i] == '"')
 		data->i++;
+	
 	else 
-		exit (1);
+		return ;
 }
 
 void	dollar_pars(t_data *data, char *args, t_global global)
