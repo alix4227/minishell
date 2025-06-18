@@ -9,16 +9,8 @@ void	get_file(t_list *list)
 	{
 		if (ft_strcmp(data->type, "REDIR_OUT") == 0 || ft_strcmp(data->type, "REDIR_IN") == 0 || ft_strcmp(data->type, "REDIR_OUT_APPEND") == 0)
 		{
-			if (data->next && ft_strcmp(data->next->type, "ARG") == 0)
+			if (data->next)
 				data->next->type = "FILE";
-			else if (data->next && ft_strcmp(data->next->type, "SPACE") == 0)
-			{
-				data = data->next;
-				while (data && ft_strcmp(data->type, "SPACE") == 0)
-					data = data->next;
-				if (ft_strcmp(data->type, "ARG") == 0)
-					data->type = "FILE";
-			}
 		}
 		data = data->next;
 	}
@@ -48,6 +40,7 @@ void	exec(t_list *list, char **env, t_global global)
 	i = 0;
 	while (data && i < cmds_numb)
 	{
+		signal(SIGINT, SIG_IGN);
 		search_redir_start(data);
 		if (ft_strcmp(data->type, "CMD") == 0)
 		{
@@ -59,6 +52,7 @@ void	exec(t_list *list, char **env, t_global global)
 			}
 			else if (pid[i] == 0)
 			{ 
+				signal(SIGINT, SIG_DFL);
 				search_redir(data);
 				if (!is_redir_out(data) && cmds_numb > 1)
 				{
@@ -98,7 +92,19 @@ void	exec(t_list *list, char **env, t_global global)
 			if (WIFEXITED(status))
 				g_r_code = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
-				g_r_code = WTERMSIG(status) + 128;
+			{
+				if (WTERMSIG(status) == SIGINT)
+				{
+					write(1, "\n", 1);
+					g_r_code = WTERMSIG(status) + 128;
+				}
+				if (WTERMSIG(status) == SIGQUIT)
+				{
+					write(1, "\n", 1);
+					g_r_code = WTERMSIG(status) + 128;
+				}
+			}
+				
 		}
 		k++;
 	}

@@ -64,7 +64,7 @@ char	*ft_strdup(char *s1);
 char	*ft_strcat(char const *s1, char const *s2);
 char	*ft_strjoin(char const *s1, char const *s2);
 int		ft_strlen_cmd(t_data *data);
-void	print_list(t_list *list);
+void	print_list(t_list *list, char *args);
 char	*get_var_name(char *retour);
 char	*get_expand(char *retour);
 void	free_list(t_list *list);
@@ -92,4 +92,5 @@ void	*ft_memset(void *str, int c, size_t len);
 int		signal_handlers(t_global global);
 void	signal_handler(int signum);
 void	search_redir_start(t_data * data);
+int		is_error(char *args);
 #endif

@@ -22,7 +22,7 @@ void	ft_redir_in(t_data *data)
 			{
 				if (ft_strcmp(data->type, "FILE") == 0 && data->word != NULL)
 				{
-					fd_infile = open(data->word, O_RDONLY);
+					fd_infile = open(data->word, O_CREAT | O_RDONLY);
 					if (fd_infile < 0)
 					{
 						perror("open failed");

@@ -7,8 +7,6 @@ void	space_pars(t_list *list, t_data *data)
 		data->retour[data->j] = '\0';
 		node_creation(list, ft_strdup(data->retour));
 		data->j = 0;
-		data->retour[data->j] = '\0';
-		node_creation(list, ft_strdup(data->retour));
 	}
 	data->i++;
 }
