@@ -41,7 +41,7 @@ void	exec(t_list *list, char **env, t_global global)
 	while (data && i < cmds_numb)
 	{
 		signal(SIGINT, SIG_IGN);
-		search_redir_start(data);
+		is_redir_start(data);
 		if (ft_strcmp(data->type, "CMD") == 0)
 		{
 			pid[i] = fork();

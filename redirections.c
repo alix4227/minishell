@@ -133,20 +133,10 @@ void	search_redir(t_data * data)
 	}
 }
 
-void	search_redir_start(t_data * data)
+void	is_redir_start(t_data * data)
 {
-	while (data && ft_strcmp(data->type, "PIPE"))
-	{
-		if (is_redir_in(data))
-		{
-			ft_redir_in(data);
-			break;
-		}
-		else if (is_redir_out(data))
-		{
-			ft_redir_out(data);
-			break;
-		}
-		data = data->next;
-	}
+	if (ft_strcmp(data->type, "REDIR_OUT") == 0)
+		ft_redir_in(data);
+	else if (ft_strcmp(data->type, "REDIR_OUT") == 0)
+		ft_redir_out(data);
 }

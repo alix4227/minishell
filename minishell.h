@@ -91,6 +91,6 @@ void	ft_redir_out_append(t_data *data);
 void	*ft_memset(void *str, int c, size_t len);
 int		signal_handlers(t_global global);
 void	signal_handler(int signum);
-void	search_redir_start(t_data * data);
+void	is_redir_start(t_data * data);
 int		is_error(char *args);
 #endif
