@@ -11,7 +11,7 @@ void	print_list(t_list *list, char *args)
 		g_r_code = 0;
 		return ;
 	}
-	printf("bash: %s: command not found", data->word);
+	printf("bash:%s: command not found", data->word);
 	g_r_code = 127;
 	printf("\n");
 }
@@ -195,23 +195,28 @@ int	is_error_2(t_data *data, t_list *list)
 int	is_unclosed_quotes(char *args)
 {
 	int	i;
-	int count;
+	int	count;
+	int	count2;
 
 	i = 0;
 	count = 0;
+	count2 = 0;
 	while (args[i])
 	{
 		if (args[i] == '\'')
 			count += 1;
+		if (args[i] == '\"')
+			count2 += 1;
 		if (count == 2)
 			count = 0;
+		if (count2 == 2)
+			count2 = 0;
 		i++;
 	}
-	if (count != 0)
+	if (count != 0 || count2 != 0)
 		return (1);
 	else
 		return (0);
-
 }
 
 int	main(int ac, char **av, char **env)
@@ -238,6 +243,13 @@ int	main(int ac, char **av, char **env)
 		add_history(args);
 		initialisation(data, args, env);
 		global.index++;
+		if (is_unclosed_quotes(args))
+		{
+			free_list(list);
+			signal_handlers(global);
+			g_r_code = 0;
+			continue ;
+		}
 		get_word(list, args, data, global);
 		get_type(data, list);
 		get_file(list);
