@@ -94,7 +94,7 @@ int		signal_handlers(t_global global);
 void	signal_handler(int signum);
 void	is_redir_start(t_data * data);
 int		is_error(char *args);
-int		is_error_2(t_data *data, t_list *list);
+int		wrong_token_error(t_data *data, t_list *list);
 int		is_unclosed_quotes(char *args);
 int		check_path_cmd(char *word);
 int		build_check_path_cmd(char *word, t_data *data, int i, int j);

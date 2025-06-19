@@ -14,200 +14,6 @@
 
 int	g_r_code;
 
-void	print_error(t_list *list, char *args)
-{
-	t_data	*data;
-	int		i;
-	int		j;
-
-	data = list->begin;
-	if (!list->begin || is_error(args) || is_unclosed_quotes(args))
-	{
-		g_r_code = 0;
-		return ;
-	}
-	printf("bash:%s: command not found", data->word);
-	g_r_code = 127;
-	printf("\n");
-}
-
-void	free_args_cmd(t_data *temp, int i)
-{
-	while (temp->args[i])
-	{
-		free(temp->args[i]);
-		temp->args[i] = NULL;
-		i++;
-	}
-	free(temp->args);
-	temp->args = NULL;
-}
-
-void	free_list(t_list *list)
-{
-	t_data	*data;
-	t_data	*temp;
-	int		i;
-
-	if (!list)
-		return ;
-	data = list->begin;
-	while (data)
-	{
-		temp = data;
-		if (temp->args)
-		{
-			i = 0;
-			free_args_cmd(temp, i);
-		}
-		data = data->next;
-		free(temp->word);
-		free(temp);
-		temp = NULL;
-	}
-	list->begin = NULL;
-	free(list);
-}
-
-void	get_type(t_data *data, t_list *list)
-{
-	data = list->begin;
-	while (data)
-	{
-		if (is_cmd(data->word, data))
-			data->type = "CMD";
-		else if (ft_strcmp(data->word, ">") == 0)
-			data->type = "REDIR_OUT";
-		else if (ft_strcmp(data->word, "<") == 0)
-			data->type = "REDIR_IN";
-		else if (ft_strcmp(data->word, ">>") == 0)
-			data->type = "REDIR_OUT_APPEND";
-		else if (ft_strcmp(data->word, "<<") == 0)
-			data->type = "HEREDOC";
-		else if (ft_strcmp(data->word, "|") == 0)
-			data->type = "PIPE";
-		else
-			data->type = "ARG";
-		data = data->next;
-	}
-}
-
-void	return_code(t_data *data, char *args, t_global global)
-{
-	int		i;
-	char	*code;
-
-	i = 0;
-	if (global.index == 1)
-		data->retour[data->j++] = '0';
-	else
-	{
-		code = ft_itoa(g_r_code);
-		while (code[i])
-			data->retour[data->j++] = code[i++];
-		free(code);
-	}
-}
-
-int	is_error(char *args)
-{
-	int	i;
-
-	i = 0;
-	while (args[i])
-	{
-		if ((args[0] == '!' || args[0] == ':') && args[1] == '\0')
-			return (1);
-		i++;
-	}
-	return (0);
-}
-
-int	check_file_after_redirin(t_data *data)
-{
-	struct stat	sb;
-
-	if (ft_strcmp(data->type, "REDIR_IN") == 0)
-	{
-		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
-		{
-			if (stat(data->next->word, &sb) != 0
-				&& !S_ISREG(sb.st_mode)
-				&& (access(data->next->word, R_OK) != 0))
-			{
-				printf("bash: %s: No such file or directory \n",
-					data->next->word);
-				return (1);
-			}
-			return (0);
-		}
-		printf("bash: syntax error near unexpected token\n");
-		return (1);
-	}
-	return (0);
-}
-
-int	check_file_after_redirout(t_data *data)
-{
-	if (is_redir_out(data) || is_redir_out_append(data))
-	{
-		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
-			return (0);
-		printf("bash: syntax error near unexpected token\n");
-		return (1);
-	}
-	return (0);
-}
-
-int	pipe_not_followed_by_cmd(t_data *data)
-{
-	if (ft_strcmp(data->type, "PIPE") == 0)
-	{
-		if (data->next && ft_strcmp(data->next->type, "CMD") == 0)
-			return (0);
-		printf("bash: syntax error near unexpected token\n");
-		return (1);
-	}
-	return (0);
-}
-
-int	check_delim_after_heredoc(t_data *data)
-{
-	if (ft_strcmp(data->type, "HEREDOC") == 0)
-	{
-		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
-			return (0);
-		printf("bash: syntax error near unexpected token\n");
-		return (1);
-	}
-	return (0);
-}
-
-int	is_error_2(t_data *data, t_list *list)
-{
-	if (!list->begin)
-		return (0);
-	data = list->begin;
-	if (ft_strcmp(list->begin->type, "PIPE") == 0)
-	{
-		printf("bash: syntax error near unexpected token\n");
-		return (1);
-	}
-	while (data)
-	{
-		if (pipe_not_followed_by_cmd(data))
-			return (1);
-		if (check_file_after_redirout(data))
-			return (1);
-		if (check_file_after_redirin(data))
-			return (1);
-		if (check_delim_after_heredoc(data))
-			return (1);
-		data = data->next;
-	}
-	return (0);
-}
-
 void	print_exec(t_list *list, t_global global, char *args, char **env)
 {
 	t_data	*data;
@@ -249,8 +55,7 @@ int	is_unclosed_quotes(char *args)
 	}
 	if (count != 0 || count2 != 0)
 		return (1);
-	else
-		return (0);
+	return (0);
 }
 
 void	tokenisation_and_exec(t_list *list, char *args,
@@ -261,7 +66,7 @@ void	tokenisation_and_exec(t_list *list, char *args,
 	data = list->begin;
 	get_type(data, list);
 	get_file(list);
-	if (is_error_2(data, list))
+	if (wrong_token_error(data, list))
 	{
 		free_list(list);
 		signal_handlers(global);
