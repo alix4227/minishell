@@ -1,5 +1,18 @@
-# include "minishell.h"
-void get_word(t_list *list, char *args, t_data *data, t_global global)
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   list_creation.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/19 09:09:49 by acrusoe           #+#    #+#             */
+/*   Updated: 2025/06/19 09:09:49 by acrusoe          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+void	get_word(t_list *list, char *args, t_data *data, t_global global)
 {
 	while (args[data->i] == ' ')
 		data->i++;
@@ -8,7 +21,7 @@ void get_word(t_list *list, char *args, t_data *data, t_global global)
 		if (args[data->i] == ' ')
 			space_pars(list, data);
 		else if (args[data->i] == '"')
-			double_quotes_pars(data,args);
+			double_quotes_pars(data, args);
 		else if (args[data->i] == '\'')
 			single_quote_pars(data, args);
 		else if (is_operator(args[data->i]))

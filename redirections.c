@@ -1,4 +1,16 @@
-# include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   redirections.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/19 09:00:31 by acrusoe           #+#    #+#             */
+/*   Updated: 2025/06/19 09:00:31 by acrusoe          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
 
 int	is_redir_in(t_data *data)
 {
@@ -13,7 +25,8 @@ int	is_redir_in(t_data *data)
 
 void	ft_redir_in(t_data *data)
 {
-	int fd_infile;
+	int	fd_infile;
+
 	while (data)
 	{
 		if (ft_strcmp(data->type, "REDIR_IN") == 0)
@@ -30,7 +43,7 @@ void	ft_redir_in(t_data *data)
 					}
 					dup2(fd_infile, STDIN_FILENO);
 					close(fd_infile);
-					break;
+					break ;
 				}
 				data = data->next;
 			}
@@ -50,10 +63,10 @@ int	is_redir_out(t_data *data)
 	return (0);
 }
 
-
 void	ft_redir_out(t_data *data)
 {
-	int fd_outfile;
+	int	fd_outfile;
+
 	while (data)
 	{
 		if (ft_strcmp(data->type, "REDIR_OUT") == 0)
@@ -62,7 +75,8 @@ void	ft_redir_out(t_data *data)
 			{
 				if (ft_strcmp(data->type, "FILE") == 0 && data->word != NULL)
 				{
-					fd_outfile = open(data->word, O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR);
+					fd_outfile = open(data->word, O_CREAT | O_WRONLY
+							| O_TRUNC, S_IRUSR | S_IWUSR);
 					if (fd_outfile < 0)
 					{
 						perror("open failed");
@@ -70,7 +84,7 @@ void	ft_redir_out(t_data *data)
 					}
 					dup2(fd_outfile, STDOUT_FILENO);
 					close(fd_outfile);
-					break;
+					break ;
 				}
 				data = data->next;
 			}
@@ -90,10 +104,10 @@ int	is_redir_out_append(t_data *data)
 	return (0);
 }
 
-
 void	ft_redir_out_append(t_data *data)
 {
-	int fd_outfile;
+	int	fd_outfile;
+
 	while (data)
 	{
 		if (ft_strcmp(data->type, "REDIR_OUT_APPEND") == 0)
@@ -102,7 +116,8 @@ void	ft_redir_out_append(t_data *data)
 			{
 				if (ft_strcmp(data->type, "FILE") == 0 && data->word != NULL)
 				{
-					fd_outfile = open(data->word, O_CREAT | O_WRONLY | O_APPEND, S_IRUSR | S_IWUSR);
+					fd_outfile = open(data->word, O_CREAT | O_WRONLY
+							| O_APPEND, S_IRUSR | S_IWUSR);
 					if (fd_outfile < 0)
 					{
 						perror("open failed");
@@ -110,7 +125,7 @@ void	ft_redir_out_append(t_data *data)
 					}
 					dup2(fd_outfile, STDOUT_FILENO);
 					close(fd_outfile);
-					break;
+					break ;
 				}
 				data = data->next;
 			}
@@ -119,7 +134,7 @@ void	ft_redir_out_append(t_data *data)
 	}
 }
 
-void	search_redir(t_data * data)
+void	search_redir(t_data *data)
 {
 	while (data && ft_strcmp(data->type, "PIPE"))
 	{
@@ -133,7 +148,7 @@ void	search_redir(t_data * data)
 	}
 }
 
-void	is_redir_start(t_data * data)
+void	is_redir_start(t_data *data)
 {
 	if (ft_strcmp(data->type, "REDIR_IN") == 0)
 		ft_redir_in(data);

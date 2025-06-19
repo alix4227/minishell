@@ -1,13 +1,36 @@
-# include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   execution.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/19 09:13:14 by acrusoe           #+#    #+#             */
+/*   Updated: 2025/06/19 09:13:14 by acrusoe          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
+int	is_redirections(t_data *data)
+{
+	if (ft_strcmp(data->type, "REDIR_OUT") == 0)
+		return (1);
+	if (ft_strcmp(data->type, "REDIR_IN") == 0)
+		return (1);
+	if (ft_strcmp(data->type, "REDIR_OUT_APPEND") == 0)
+		return (1);
+	return (0);
+}
 
 void	get_file(t_list *list)
 {
-	t_data *data;
+	t_data	*data;
 
 	data = list->begin;
 	while (data)
 	{
-		if (ft_strcmp(data->type, "REDIR_OUT") == 0 || ft_strcmp(data->type, "REDIR_IN") == 0 || ft_strcmp(data->type, "REDIR_OUT_APPEND") == 0)
+		if (is_redirections(data))
 		{
 			if (data->next)
 				data->next->type = "FILE";
@@ -18,7 +41,7 @@ void	get_file(t_list *list)
 
 void	exec(t_list *list, char **env, t_global global)
 {
-	t_data *data = list->begin;
+	t_data	*data = list->begin;
 	int	cmds_numb = get_cmd_nb(data);
 	int	**pipefd;
 	int	status;

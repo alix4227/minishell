@@ -1,11 +1,25 @@
-# include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   args_cmds.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/19 09:41:02 by acrusoe           #+#    #+#             */
+/*   Updated: 2025/06/19 09:41:02 by acrusoe          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-int	is_operator2(char *word) 
+#include "minishell.h"
+
+int	is_operator2(char *word)
 {
-	char *operators[] = {"|", ">", "<", ">>", NULL};
-	int i = 0;
+	char	*operators[] = {"|", ">", "<", ">>", NULL};
+	int		i;
 
-	while (operators[i]) {
+	i = 0;
+	while (operators[i])
+	{
 		if (ft_strcmp(word, operators[i]) == 0)
 			return (1);
 		i++;
@@ -15,8 +29,8 @@ int	is_operator2(char *word)
 
 void	fill_args_cmd(t_data *data, int k)
 {
-	t_data *cmd;
-	int len;
+	t_data	*cmd;
+	int		len;
 
 	cmd = data;
 	len = ft_strlen_cmd(data);
@@ -40,7 +54,7 @@ void	fill_args_cmd(t_data *data, int k)
 
 void	get_args_cmd(t_data *data, t_list *list)
 {
-	int k;
+	int	k;
 
 	k = 0;
 	data = list->begin;
@@ -59,7 +73,7 @@ void	get_args_cmd(t_data *data, t_list *list)
 
 int	get_cmd_nb(t_data *data)
 {
-	int cmds_numb;
+	int	cmds_numb;
 
 	cmds_numb = 0;
 	while (data)

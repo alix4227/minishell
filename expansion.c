@@ -1,4 +1,16 @@
-# include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expansion.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/19 09:11:45 by acrusoe           #+#    #+#             */
+/*   Updated: 2025/06/19 09:11:45 by acrusoe          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
 
 char	*get_var_name(char *retour)
 {
@@ -30,14 +42,14 @@ char	*get_expand(char *retour)
 	char	*var;
 	int		i;
 	int		j;
-	int len;
+	int		len;
 
 	len = ft_strlen(retour);
 	i = 0;
 	j = 0;
-	var =  get_var_name(retour);
+	var = get_var_name(retour);
 	if (!var[0])
-		return(ft_strdup("$"));
+		return (ft_strdup("$"));
 	else
 		env_value = ft_strdup(getenv(var));
 	return (env_value);
@@ -55,8 +67,8 @@ void	expansion(t_data *data, char *args)
 	var = malloc(sizeof(char) * (len + 1));
 	expand = ft_strdup("");
 	var[k++] = '$';
-	while (args[data->i] && !is_operator(args[data->i]) && !is_quote(args[data->i])
-		&& args[data->i] != '$')
+	while (args[data->i] && !is_operator(args[data->i])
+		&& !is_quote(args[data->i]) && args[data->i] != '$')
 		var[k++] = args[data->i++];
 	var[k] = '\0';
 	expand = get_expand(var);
@@ -78,7 +90,8 @@ void	double_quotes_expansion(t_data *data, char *args)
 	data->i++;
 	k = 0;
 	temp[k++] = '$';
-	while (args[data->i] && !is_quote(args[data->i]) && args[data->i] != '$' && args[data->i] != ' ')
+	while (args[data->i] && !is_quote(args[data->i])
+		&& args[data->i] != '$' && args[data->i] != ' ')
 		temp[k++] = args[data->i++];
 	temp[k] = '\0';
 	expanded = get_expand(temp);

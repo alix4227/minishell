@@ -1,12 +1,27 @@
-# include "minishell.h"
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   main.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/06/19 08:38:35 by acrusoe           #+#    #+#             */
+/*   Updated: 2025/06/19 08:38:35 by acrusoe          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "minishell.h"
+
 int	g_r_code;
+
 void	print_list(t_list *list, char *args)
 {
-	t_data *data;
-	int	i;
-	int j;
+	t_data	*data;
+	int		i;
+	int		j;
+
 	data = list->begin;
-	if (!list->begin || is_error(args) ||is_unclosed_quotes(args))
+	if (!list->begin || is_error(args) || is_unclosed_quotes(args))
 	{
 		g_r_code = 0;
 		return ;
@@ -16,14 +31,14 @@ void	print_list(t_list *list, char *args)
 	printf("\n");
 }
 
-void free_list(t_list *list)
+void	free_list(t_list *list)
 {
-	t_data *data;
-	t_data *temp;
-	int i;
+	t_data	*data;
+	t_data	*temp;
+	int		i;
 
 	if (!list)
-		return;
+		return ;
 	data = list->begin;
 	while (data)
 	{
@@ -47,7 +62,6 @@ void free_list(t_list *list)
 	}
 	list->begin = NULL;
 	free(list);
-	
 }
 
 void	get_type(t_data *data, t_list *list)
@@ -75,8 +89,8 @@ void	get_type(t_data *data, t_list *list)
 
 void	return_code(t_data *data, char *args, t_global global)
 {
-	int	i;
-	char *code;
+	int		i;
+	char	*code;
 
 	i = 0;
 	if (global.index == 1)
@@ -92,7 +106,7 @@ void	return_code(t_data *data, char *args, t_global global)
 
 int	is_error(char *args)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (args[i])
@@ -106,23 +120,26 @@ int	is_error(char *args)
 
 int	check_file_after_redirin(t_data *data)
 {
-	struct stat sb;
+	struct stat	sb;
+
 	if (ft_strcmp(data->type, "REDIR_IN") == 0)
 	{
 		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
 		{
-			if (stat(data->next->word, &sb) == 0 &&
-				S_ISREG(sb.st_mode) &&
-				(access(data->next->word, X_OK) == 0))
+			if (stat(data->next->word, &sb) == 0
+				&& S_ISREG(sb.st_mode)
+				&& (access(data->next->word, X_OK) == 0))
 			{
-				printf("bash: %s: No such file or directory \n", data->next->word);
+				printf("bash: %s: No such file or directory \n",
+					data->next->word);
 				return (1);
 			}
 			if (access(data->next->word, X_OK))
 				return (0);
 			else
 			{
-				printf("bash: %s: No such file or directory \n", data->next->word);
+				printf("bash: %s: No such file or directory \n",
+					data->next->word);
 				return (1);
 			}
 		}
@@ -154,7 +171,6 @@ int	pipe_not_followed_by_cmd(t_data *data)
 		return (1);
 	}
 	return (0);
-	
 }
 
 int	check_delim_after_heredoc(t_data *data)
@@ -171,6 +187,8 @@ int	check_delim_after_heredoc(t_data *data)
 
 int	is_error_2(t_data *data, t_list *list)
 {
+	if (!list->begin)
+		return (0);
 	data = list->begin;
 	if (ft_strcmp(list->begin->type, "PIPE") == 0)
 	{
@@ -221,10 +239,11 @@ int	is_unclosed_quotes(char *args)
 
 int	main(int ac, char **av, char **env)
 {
-	t_list *list;
-	t_data	*data;
-	t_global global;
-	char *args;
+	t_list		*list;
+	t_data		*data;
+	t_global	global;
+	char		*args;
+
 	signal_handlers(global);
 	while (1)
 	{
@@ -238,7 +257,7 @@ int	main(int ac, char **av, char **env)
 		if (!args)
 		{
 			write(1, "exit\n", 5);
-			break;
+			break ;
 		}
 		add_history(args);
 		initialisation(data, args, env);
@@ -266,7 +285,7 @@ int	main(int ac, char **av, char **env)
 			if (ft_strcmp(data->type, "CMD") == 0)
 			{
 				exec(list, env, global);
-				break;
+				break ;
 			}
 			data = data->next;
 		}

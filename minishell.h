@@ -53,6 +53,7 @@ int		is_redir_in(t_data *data);
 void	ft_redir_in(t_data *data);
 int		is_redir_out(t_data *data);
 void	ft_redir_out(t_data *data);
+int		is_redirections(t_data *data);
 void	exec(t_list *list, char **env, t_global global);
 int		ft_strlen(char const *args);
 char	*ft_realloc(char *expanded, char *retour, t_data *data);
@@ -95,4 +96,8 @@ void	is_redir_start(t_data * data);
 int		is_error(char *args);
 int		is_error_2(t_data *data, t_list *list);
 int		is_unclosed_quotes(char *args);
+int		check_path_cmd(char *word);
+int		build_check_path_cmd(char *word, t_data *data, int i, int j);
+char	*build_path(char *cmd, char *word);
+int		is_chevrons(t_data *data);
 #endif
