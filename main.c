@@ -31,6 +31,18 @@ void	print_list(t_list *list, char *args)
 	printf("\n");
 }
 
+void	free_args_cmd(t_data *temp, int i)
+{
+	while (temp->args[i])
+	{
+		free(temp->args[i]);
+		temp->args[i] = NULL;
+		i++;
+	}
+	free(temp->args);
+	temp->args = NULL;
+}
+
 void	free_list(t_list *list)
 {
 	t_data	*data;
@@ -46,14 +58,7 @@ void	free_list(t_list *list)
 		if (temp->args)
 		{
 			i = 0;
-			while (temp->args[i])
-			{
-				free(temp->args[i]);
-				temp->args[i] = NULL;
-				i++;
-			}
-			free(temp->args);
-			temp->args = NULL;
+			free_args_cmd(temp, i);
 		}
 		data = data->next;
 		free(temp->word);
@@ -126,22 +131,15 @@ int	check_file_after_redirin(t_data *data)
 	{
 		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
 		{
-			if (stat(data->next->word, &sb) == 0
-				&& S_ISREG(sb.st_mode)
-				&& (access(data->next->word, X_OK) == 0))
+			if (stat(data->next->word, &sb) != 0
+				&& !S_ISREG(sb.st_mode)
+				&& (access(data->next->word, R_OK) != 0))
 			{
 				printf("bash: %s: No such file or directory \n",
 					data->next->word);
 				return (1);
 			}
-			if (access(data->next->word, X_OK))
-				return (0);
-			else
-			{
-				printf("bash: %s: No such file or directory \n",
-					data->next->word);
-				return (1);
-			}
+			return (0);
 		}
 		printf("bash: syntax error near unexpected token\n");
 		return (1);

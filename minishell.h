@@ -100,4 +100,6 @@ int		check_path_cmd(char *word);
 int		build_check_path_cmd(char *word, t_data *data, int i, int j);
 char	*build_path(char *cmd, char *word);
 int		is_chevrons(t_data *data);
+void	dollar_pars_digit_quote(t_data *data, char *args);
+void	free_args_cmd(t_data *temp, int i);
 #endif
