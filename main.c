@@ -14,7 +14,7 @@
 
 int	g_r_code;
 
-void	print_list(t_list *list, char *args)
+void	print_error(t_list *list, char *args)
 {
 	t_data	*data;
 	int		i;
@@ -149,7 +149,7 @@ int	check_file_after_redirin(t_data *data)
 
 int	check_file_after_redirout(t_data *data)
 {
-	if (ft_strcmp(data->type, "REDIR_OUT") == 0 || ft_strcmp(data->type, "REDIR_OUT_APPEND") == 0)
+	if (is_redir_out(data) || is_redir_out_append(data))
 	{
 		if (data->next && ft_strcmp(data->next->type, "FILE") == 0)
 			return (0);
@@ -208,6 +208,24 @@ int	is_error_2(t_data *data, t_list *list)
 	return (0);
 }
 
+void	print_exec(t_list *list, t_global global, char *args, char **env)
+{
+	t_data	*data;
+
+	data = list->begin;
+	while (data)
+	{
+		if (ft_strcmp(data->type, "CMD") == 0)
+		{
+			exec(list, env, global);
+			break ;
+		}
+		data = data->next;
+	}
+	if (!data)
+		print_error(list, args);
+}
+
 int	is_unclosed_quotes(char *args)
 {
 	int	i;
@@ -235,19 +253,56 @@ int	is_unclosed_quotes(char *args)
 		return (0);
 }
 
+void	tokenisation_and_exec(t_list *list, char *args,
+	t_global global, char **env)
+{
+	t_data	*data;
+
+	data = list->begin;
+	get_type(data, list);
+	get_file(list);
+	if (is_error_2(data, list))
+	{
+		free_list(list);
+		signal_handlers(global);
+		return ;
+	}
+	get_args_cmd(data, list);
+	print_exec(list, global, args, env);
+	rl_redisplay();
+	free_list(list);
+	signal_handlers(global);
+}
+
+void	program_handler(t_list *list, char *args, t_global global, char **env)
+{
+	t_data	*data;
+
+	data = malloc(sizeof(t_data));
+	ft_memset(data, 0, sizeof(t_data));
+	initialisation(data, args, env);
+	if (is_unclosed_quotes(args))
+	{
+		free_list(list);
+		signal_handlers(global);
+		g_r_code = 0;
+		return ;
+	}
+	get_word(list, args, data, global);
+	tokenisation_and_exec(list, args, global, env);
+}
+
 int	main(int ac, char **av, char **env)
 {
 	t_list		*list;
-	t_data		*data;
 	t_global	global;
 	char		*args;
 
 	signal_handlers(global);
 	while (1)
 	{
-		data = malloc(sizeof(t_data));
 		list = malloc(sizeof(t_list));
-		if (!list ||!data)
+		if (!list)
 			return (0);
 		list->begin = NULL;
 		list->end = NULL;
@@ -258,40 +313,8 @@ int	main(int ac, char **av, char **env)
 			break ;
 		}
 		add_history(args);
-		initialisation(data, args, env);
 		global.index++;
-		if (is_unclosed_quotes(args))
-		{
-			free_list(list);
-			signal_handlers(global);
-			g_r_code = 0;
-			continue ;
-		}
-		get_word(list, args, data, global);
-		get_type(data, list);
-		get_file(list);
-		if (is_error_2(data, list))
-		{
-			free_list(list);
-			signal_handlers(global);
-			continue ;
-		}
-		get_args_cmd(data, list);
-		data = list->begin;
-		while (data)
-		{
-			if (ft_strcmp(data->type, "CMD") == 0)
-			{
-				exec(list, env, global);
-				break ;
-			}
-			data = data->next;
-		}
-		if (!data)
-			print_list(list, args);
-		rl_redisplay();
-		free_list(list);
-		signal_handlers(global);
+		program_handler(list, args, global, env);
 	}
 	return (0);
 }

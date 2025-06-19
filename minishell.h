@@ -65,7 +65,7 @@ char	*ft_strdup(char *s1);
 char	*ft_strcat(char const *s1, char const *s2);
 char	*ft_strjoin(char const *s1, char const *s2);
 int		ft_strlen_cmd(t_data *data);
-void	print_list(t_list *list, char *args);
+void	print_error(t_list *list, char *args);
 char	*get_var_name(char *retour);
 char	*get_expand(char *retour);
 void	free_list(t_list *list);
@@ -102,4 +102,7 @@ char	*build_path(char *cmd, char *word);
 int		is_chevrons(t_data *data);
 void	dollar_pars_digit_quote(t_data *data, char *args);
 void	free_args_cmd(t_data *temp, int i);
+void	print_exec(t_list *list, t_global global, char *args, char **env);
+void	program_handler(t_list *list, char *args, t_global global, char **env);
+void	tokenisation_and_exec(t_list *list, char *args, t_global global, char **env);
 #endif
