@@ -22,6 +22,11 @@ void	signal_handler(int signum)
 		rl_redisplay();
 		set_get_exit_status(130);
 	}
+	else if (signum == SIGQUIT)
+	{
+		write(1, "\n", 1);
+		set_get_exit_status(130);
+	}
 }
 
 int	signal_handlers(void)
@@ -34,8 +39,9 @@ int	signal_handlers(void)
 	sigemptyset(&action_int.sa_mask);
 	action_int.sa_flags = 0;
 	sigaction(SIGINT, &action_int, NULL);
+
 	action_quit = (struct sigaction){};
-	action_quit.sa_handler = SIG_IGN;
+	action_quit.sa_handler = signal_handler;
 	sigemptyset(&action_quit.sa_mask);
 	action_quit.sa_flags = 0;
 	sigaction(SIGQUIT, &action_quit, NULL);

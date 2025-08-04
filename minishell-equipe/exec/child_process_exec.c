@@ -37,7 +37,7 @@ void	pipe_creation(t_data *data, int cmds_numb)
 	{
 		data->pipefd = ft_malloc(sizeof(int *) * (cmds_numb - 1));
 		if (!data->pipefd)
-			exit_clean(1);
+		exit_clean(1);
 	}
 	while (i < (cmds_numb - 1))
 	{
@@ -68,15 +68,16 @@ int	child_process_pipe(t_data *data, t_list *list,
 						t_list_env *env_list, int i)
 {
 	int	cmds_numb;
-	int	redirout;
-
+	
 	cmds_numb = get_cmd_nb(data, list);
-	redirout = 0;
 	signal(SIGINT, SIG_DFL);
-	if (!search_redir(data, env_list, &redirout))
-		exit(0);
-	if (!redirout && cmds_numb > 1)
+	signal(SIGQUIT, SIG_DFL);
+	if (cmds_numb > 1)
 		check_pipes(i, data, list, cmds_numb);
+	// if (!search_redir_backward(data, env_list))
+	// 	exit(0);
+	if (!search_redir(data, env_list))
+		exit(0);
 	if (built_cmd_child(data->word))
 		test_builtins_child(data, env_list, list);
 	else
@@ -114,10 +115,7 @@ void	pids_handler(pid_t *pid, int cmds_numb)
 	while (k < cmds_numb)
 	{
 		if (waitpid(pid[k], &status, 0) == -1)
-		{
-			perror("waitpid");
 			return ;
-		}
 		if (k == cmds_numb - 1)
 			last_pid_handler(status);
 		k++;

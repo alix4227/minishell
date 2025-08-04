@@ -6,7 +6,7 @@
 /*   By: hmimouni <hmimouni@>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 19:44:03 by hmimouni          #+#    #+#             */
-/*   Updated: 2025/07/29 14:00:22 by hmimouni         ###   ########.fr       */
+/*   Updated: 2025/07/30 23:46:21 by hmimouni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,8 @@ void	test_builtins_child(t_data *data, t_list_env *envp, t_list *list)
 		ft_pwd();
 	else if (ft_strcmp(data->word, "env") == 0)
 		ft_env(envp, data);
+	close(data->original_stdout);
+	close(list->begin->saved_stdin);
 	ft_close_all_pipes(list->begin->pipefd, data, list);
 	free_env_list(envp);
 	ft_malloc(-1);

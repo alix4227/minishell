@@ -48,21 +48,12 @@ int	check_file_after_redirout(t_data *data)
 	return (0);
 }
 
-int	last_pipe_not_followed_by_cmd(t_data *data)
+int	last_pipe_not_followed_by_cmd(t_data *data, t_list *list)
 {
-	int	flags;
-
-	flags = 1;
-	while (data)
-	{
-		if (ft_strcmp(data->type, "PIPE") == 0)
-		{
-			if (!data->next || ft_strcmp(data->next->type, "CMD"))
-				flags = 0;
-		}
-		data = data->next;
-	}
-	if (flags == 0)
+	data = list->end;
+	while (ft_strcmp(data->word, "") == 0)
+		data = data->back;
+	if (ft_strcmp(data->type, "PIPE") == 0)
 	{
 		printf("bash: command not found\n");
 		return (0);
@@ -70,21 +61,17 @@ int	last_pipe_not_followed_by_cmd(t_data *data)
 	return (1);
 }
 
-void	pipe_not_followed_by_cmd(t_data *data)
+void	pipe_not_followed_by_cmd(t_data *data, t_list *list)
 {
-	int	flags;
-
-	flags = 0;
-	while (data != NULL)
+	if (ft_strcmp(data->type, "ARG") == 0 && is_cmd_type(data))
+		printf("bash: command not found\n");
+	data = list->begin;
+	while (data)
 	{
-		if (ft_strcmp(data->type, "CMD") == 0)
-			flags = 1;
-		if (ft_strcmp(data->type, "PIPE") == 0)
+		if (data->next && ft_strcmp(data->type, "PIPE") == 0)
 		{
-			if (flags == 0)
+			if (!is_redirections(data->next) && ft_strcmp(data->next->type, "CMD"))
 				printf("bash: command not found\n");
-			else
-				flags = 0;
 		}
 		data = data->next;
 	}
@@ -98,6 +85,11 @@ int	wrong_token_error(t_data *data, t_list *list)
 	if (ft_strcmp(list->begin->type, "PIPE") == 0)
 	{
 		printf("bash: syntax error near unexpected token\n");
+		return (1);
+	}
+	if (ft_strcmp(list->begin->type, "ARG") == 0)
+	{
+		printf("bash: command not found\n");
 		return (1);
 	}
 	while (data)

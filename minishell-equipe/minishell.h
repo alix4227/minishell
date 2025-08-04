@@ -31,9 +31,11 @@
 typedef struct s_data
 {
 	int				saved_stdin;
+	int				original_stdout;
 	char			*word;
 	char			*type;
 	int				index;
+	int				redir_check;
 	int				ind;
 	char			**args;
 	int				flag;
@@ -141,6 +143,10 @@ void		ft_exit(char **args);
 //exec../here_doc.c
 int			here_doc(t_data *data, t_list_env *env);
 int			has_heredoc(t_data *data);
+void		process_single_heredoc(t_data *data, t_list_env *env, int fd);
+char		*get_current_delimiter(t_data *data);
+int			is_last_heredoc(t_data *data);
+t_data		*find_next_heredoc(t_data *current);
 
 //exec../expand_heredoc
 char		*append_char(char c);
@@ -203,7 +209,7 @@ int			is_redir_in(t_data *data);
 void		ft_redir_in(t_data *data);
 
 // pars../redirection_out
-int			is_redir_out(t_data *data, int *redirout);
+int			is_redir_out(t_data *data);
 int			is_redir_out2(t_data *data);
 void		ft_redir_out(t_data *data);
 int			is_redir_out_append(t_data *data);
@@ -272,17 +278,20 @@ char		*search_in_env(char *expand, t_list_env *env);
 void		exit_clean(int exit_code);
 
 // utils../redirection_checker
-int			search_redir(t_data *data, t_list_env *env, int *redirout);
-int			is_redir_start(t_data *data, t_list_env *env);
+int			search_redir(t_data *data, t_list_env *env);
+int			search_redir_backward(t_data *data, t_list_env *env);
+int			is_redir_start(t_data *data, t_list_env *env, t_list *list);
+int			not_check(t_list *list);
 
 // utils../syntax_error_token
 int			wrong_token_error(t_data *data, t_list *list);
 int			check_delim_after_heredoc(t_data *data);
-void		pipe_not_followed_by_cmd(t_data *data);
+void		pipe_not_followed_by_cmd(t_data *data, t_list *list);
 int			check_file_after_redirout(t_data *data);
 int			check_file_after_redirin(t_data *data);
-int			last_pipe_not_followed_by_cmd(t_data *data);
+int			last_pipe_not_followed_by_cmd(t_data *data, t_list *list);
 int			is_file_readable(t_data *data, t_list *list);
+int			is_cmd_type(t_data *data);
 
 // util../builtin_utils
 int			is_valid_identifier(char *str);

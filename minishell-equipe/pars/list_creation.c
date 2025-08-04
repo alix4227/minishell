@@ -31,6 +31,8 @@ void	get_word(t_list *list, char *args, t_data *data, t_list_env *env)
 			operator_pars(list, data, args, &is_quote);
 		else if (args[data->i] == '$')
 			dollar_pars(data, args, env);
+		else if (args[data->i] == '\\' || args[data->i] == ';')
+			data->i++;
 		else
 			data->retour[data->j++] = args[data->i++];
 	}

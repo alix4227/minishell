@@ -75,8 +75,8 @@ void	double_quotes_pars(t_data *data, char *args,
 		else
 			data->retour[data->j++] = args[data->i++];
 	}
-	if (args[data->i == 1] == '"')
-		data->retour[data->j++] = ' ';
+	// if (args[data->i == 1] == '"')
+	// 	data->retour[data->j++] = ' ';
 	if (args[data->i] == '"')
 		data->i++;
 	else

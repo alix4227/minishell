@@ -6,7 +6,7 @@
 /*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 19:55:57 by hmimouni          #+#    #+#             */
-/*   Updated: 2025/07/27 16:39:13 by acrusoe          ###   ########.fr       */
+/*   Updated: 2025/08/01 19:03:44 by acrusoe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,15 @@ void	get_file(t_list *list)
 		}
 		data = data->next;
 	}
+}
+
+int	is_cmd_type(t_data *data)
+{
+	while (data)
+	{
+		if (ft_strcmp(data->type, "CMD") == 0)
+			return (1);
+		data = data->next;
+	}
+	return (0);
 }

@@ -38,15 +38,15 @@ int	check_delim_after_heredoc(t_data *data)
 	return (0);
 }
 
-void	process_heredoc_line(int fd, char *line, t_list_env *env)
-{
-	char	*expanded;
+// void	process_heredoc_line(int fd, char *line, t_list_env *env)
+// {
+// 	char	*expanded;
 
-	expanded = expand_line(line, env);
-	write(fd, expanded, ft_strlen(expanded));
-	write(fd, "\n", 1);
-	free(line);
-}
+// 	expanded = expand_line(line, env);
+// 	write(fd, expanded, ft_strlen(expanded));
+// 	write(fd, "\n", 1);
+// 	free(line);
+// }
 
 int	handle_cmd_execution(t_data *data, t_list *list,
 							t_list_env *env_list)
@@ -59,7 +59,9 @@ int	handle_cmd_execution(t_data *data, t_list *list,
 			if (data->here_doc_fd >= 0)
 				unlink("here_doc");
 			data->here_doc_fd = 0;
+			// printf("JE SUIS LE FD %d\n", list->begin->saved_stdin);
 			dup2(list->begin->saved_stdin, STDIN_FILENO);
+			// printf("JE CLOSE LE FD %d\n", list->begin->saved_stdin);
 			close(list->begin->saved_stdin);
 			return (1);
 		}

@@ -51,7 +51,9 @@
 void	print_exec(t_list *list, char *args, t_list_env *env_list)
 {
 	t_data	*data;
+	int	flag;
 
+	flag = 0;
 	if (!list || !list->begin)
 	{
 		print_error(list, args);
@@ -66,13 +68,20 @@ void	print_exec(t_list *list, char *args, t_list_env *env_list)
 	}
 	if (handle_cmd_execution(data, list, env_list))
 		return ;
-	if (ft_strcmp(list->begin->type, "HERE_DOC") == 0)
+	while (data)
 	{
-		here_doc(list->begin, env_list);
-		dup2(list->begin->saved_stdin, STDIN_FILENO);
-		close(list->begin->saved_stdin);
+		if (ft_strcmp(data->type, "HERE_DOC") == 0)
+		{
+			here_doc(data, env_list);
+			dup2(list->begin->saved_stdin, STDIN_FILENO);
+			close(list->begin->saved_stdin);
+			flag = 1;
+			break;
+		}
+		data = data->next;
 	}
-	print_error(list, args);
+	if (!flag)
+		print_error(list, args);
 }
 
 int	tokenisation_and_exec(t_list *list, char *args,
@@ -87,10 +96,10 @@ int	tokenisation_and_exec(t_list *list, char *args,
 		return (0);
 	get_args_cmd(data, list);
 	initialisation_cmd_numb(data, list);
-	if (!last_pipe_not_followed_by_cmd(data))
+	if (!last_pipe_not_followed_by_cmd(data, list))
 		return (0);
 	print_exec(list, args, env_list);
-	pipe_not_followed_by_cmd(data);
+	pipe_not_followed_by_cmd(data, list);
 	rl_redisplay();
 	signal_handlers();
 	return (1);
@@ -121,6 +130,8 @@ void	program_handler(t_list *list, char *args, char **env,
 void	main_loop_function(t_list *list, char *args, char **env,
 						t_list_env *env_list)
 {
+	signal(SIGQUIT, SIG_IGN);
+	signal(SIGTSTP, SIG_IGN);
 	while (1)
 	{
 		set_get_env(env_list);
