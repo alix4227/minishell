@@ -53,10 +53,14 @@ void	single_quote_pars(t_data *data, char *args, int *is_quote)
 {
 	data->i++;
 	*is_quote = 1;
+	if (args[data->i] == '\'')
+	{
+		data->retour[data->j++] = '\0';
+		data->i++;
+		return ;
+	}
 	while (args[data->i] && args[data->i] != '\'')
 		data->retour[data->j++] = args[data->i++];
-	if (args[data->i == 1] == '\'')
-		data->retour[data->j++] = ' ';
 	if (args[data->i] == '\'')
 		data->i++;
 	else
@@ -68,15 +72,19 @@ void	double_quotes_pars(t_data *data, char *args,
 {
 	data->i++;
 	*is_quote = 1;
+	if (args[data->i] == '\"')
+	{
+		data->retour[data->j++] = '\0';
+		data->i++;
+		return ;
+	}
 	while (args[data->i] && args[data->i] != '"')
 	{
-		if (args[data->i] == '$')
+		if (args[data->i] == '$' && !is_delimiter_before(args, data))
 			double_quotes_expansion(data, args, env);
 		else
 			data->retour[data->j++] = args[data->i++];
 	}
-	// if (args[data->i == 1] == '"')
-	// 	data->retour[data->j++] = ' ';
 	if (args[data->i] == '"')
 		data->i++;
 	else

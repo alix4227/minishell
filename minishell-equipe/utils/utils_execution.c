@@ -6,7 +6,7 @@
 /*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/18 19:55:57 by hmimouni          #+#    #+#             */
-/*   Updated: 2025/08/01 19:03:44 by acrusoe          ###   ########.fr       */
+/*   Updated: 2025/08/04 22:25:47 by acrusoe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,10 @@ void	get_file(t_list *list)
 		if (is_redirections(data))
 		{
 			if (data->next && ft_strcmp(data->type, "PIPE"))
+			{
 				data->next->type = "FILE";
+				ft_redir_out2(data);
+			}
 		}
 		else if (ft_strcmp(data->type, "HERE_DOC") == 0)
 		{
@@ -53,4 +56,30 @@ int	is_cmd_type(t_data *data)
 		data = data->next;
 	}
 	return (0);
+}
+
+int	check_and_handle_here_doc(t_list *list, t_list_env *env_list)
+{
+	t_data	*data;
+
+	data = list->begin;
+	while (data)
+	{
+		if (ft_strcmp(data->type, "HERE_DOC") == 0)
+		{
+			here_doc(data, env_list);
+			dup2(list->begin->saved_stdin, STDIN_FILENO);
+			close(list->begin->saved_stdin);
+			return (1);
+		}
+		data = data->next;
+	}
+	return (0);
+}
+
+void	initialisation_cmd_numb(t_data *data, t_list *list)
+{
+	if (!data)
+		return ;
+	data->cmds_numb = get_cmd_nb(data, list);
 }

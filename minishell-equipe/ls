@@ -1,0 +1,16 @@
+Makefile
+alix
+exec
+lechat
+ls
+main.c
+main.o
+minishell
+minishell.h
+minishell.supp
+pars
+signals.c
+signals.o
+truc
+truc1
+utils

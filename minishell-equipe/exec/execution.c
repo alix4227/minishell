@@ -83,28 +83,10 @@ int	handle_heredoc_failure(t_data *data)
 	return (1);
 }
 
-int	handle_builtin_if_needed(t_data *data, t_list_env *env_list, t_list *list)
-{
-	if (built_cmd_parent(data->word))
-	{
-		test_builtins_parents(data, env_list, list);
-		return (1);
-	}
-	// if(ft_strcmp(data->next->type, "PIPE") == 0)
-	// {
-	// 	if (ft_strcmp(data->word, "exit") == 0)
-	// 	{
-	// 		ft_close_all_pipes(list->begin->pipefd, data, list);
-	// 		ft_exit(data->args);
-	// 	}
-	// }
-	return (0);
-}
-
 int	exec_main_function(t_data *data, t_list *list,
 					t_list_env *env_list, pid_t *pid)
 {
-	int original_stdout;
+	int	original_stdout;
 	int	original_stdin;
 
 	original_stdout = dup(STDOUT_FILENO);
@@ -112,12 +94,9 @@ int	exec_main_function(t_data *data, t_list *list,
 	while (data && list->begin->ind < list->begin->cmds_numb)
 	{
 		signal(SIGINT, SIG_IGN);
-		// if (!is_redir_start(data, env_list))
-		// 	return (handle_heredoc_failure(data));
 		if (ft_strcmp(data->type, "CMD") == 0)
 		{
-			dup2(original_stdout, STDOUT_FILENO);
-			dup2(original_stdin, STDIN_FILENO);
+			reinitialisation_std(original_stdout, original_stdin);
 			if (handle_builtin_if_needed(data, env_list, list))
 				return (1);
 			if (!handle_fork_and_exec(data, list, env_list, pid))
@@ -125,10 +104,7 @@ int	exec_main_function(t_data *data, t_list *list,
 		}
 		data = data->next;
 	}
-	dup2(original_stdout, STDOUT_FILENO);
-	close(original_stdout);
-	dup2(original_stdin, STDIN_FILENO);
-	close(original_stdin);
+	reinitialisation_std(original_stdout, original_stdin);
 	return (0);
 }
 
@@ -153,6 +129,8 @@ void	exec(t_list *list, t_list_env *env_list)
 		return ;
 	if (cmds_numb > 1)
 		ft_close_all_pipes(list->begin->pipefd, data, list);
+	while (data && ft_strcmp(data->type, "CMD"))
+		data = data->next;
 	if (!data->heredoc_exit)
 		pids_handler(pid, cmds_numb);
 }

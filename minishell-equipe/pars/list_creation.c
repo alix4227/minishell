@@ -12,6 +12,15 @@
 
 #include "minishell.h"
 
+void	add_word_in_node(t_list *list, t_data *data, int *is_quote)
+{
+	if (data->j > 0)
+	{
+		data->retour[data->j] = '\0';
+		node_creation(list, data->retour, is_quote);
+	}
+}
+
 void	get_word(t_list *list, char *args, t_data *data, t_list_env *env)
 {
 	int	is_quote;
@@ -36,11 +45,7 @@ void	get_word(t_list *list, char *args, t_data *data, t_list_env *env)
 		else
 			data->retour[data->j++] = args[data->i++];
 	}
-	if (data->j > 0)
-	{
-		data->retour[data->j] = '\0';
-		node_creation(list, data->retour, &is_quote);
-	}
+	add_word_in_node(list, data, &is_quote);
 }
 
 void	does_word_exist(t_data *data, char *retour, int *is_quote)
@@ -102,11 +107,4 @@ void	initialisation(t_data *data, char *args, char **env)
 		exit(1);
 	}
 	data->env_child_process = env;
-}
-
-void	initialisation_cmd_numb(t_data *data, t_list *list)
-{
-	if (!data)
-		return ;
-	data->cmds_numb = get_cmd_nb(data, list);
 }

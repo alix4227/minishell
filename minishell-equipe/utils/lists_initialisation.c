@@ -29,3 +29,42 @@ void	initialisation_list(t_list **list)
 	(*list)->begin = NULL;
 	(*list)->end = NULL;
 }
+
+void	here_doc_without_cmd(t_data	*data, t_list_env *env_list,
+	int *flag, t_list *list)
+{
+	while (data)
+	{
+		if (ft_strcmp(data->type, "HERE_DOC") == 0)
+		{
+			here_doc(data, env_list);
+			dup2(list->begin->saved_stdin, STDIN_FILENO);
+			close(list->begin->saved_stdin);
+			*flag = 1;
+			break ;
+		}
+		data = data->next;
+	}
+}
+
+void	print_exec(t_list *list, char *args, t_list_env *env_list, char **env)
+{
+	t_data	*data;
+
+	if (!list || !list->begin)
+	{
+		print_error(list, args);
+		return ;
+	}
+	data = list->begin;
+	data->saved_stdin = dup(STDIN_FILENO);
+	if (data->saved_stdin < 0)
+	{
+		perror("dup");
+		exit(EXIT_FAILURE);
+	}
+	if (handle_cmd_execution(data, list, env_list, env))
+		return ;
+	if (!check_and_handle_here_doc(list, env_list))
+		print_error(list, args);
+}

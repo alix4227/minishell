@@ -77,3 +77,11 @@ char	*ft_itoa(int n)
 	str[len] = '\0';
 	return (str);
 }
+
+void	reinitialisation_std(int original_stdout, int original_stdin)
+{
+	dup2(original_stdout, STDOUT_FILENO);
+	close(original_stdout);
+	dup2(original_stdin, STDIN_FILENO);
+	close(original_stdin);
+}

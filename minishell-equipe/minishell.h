@@ -89,6 +89,7 @@ int			is_redirections(t_data *data);
 void		exec(t_list *list, t_list_env *env_list);
 void		pids_handler(pid_t *pid, int cmds_numb);
 void		last_pid_handler(int status);
+void		reinitialisation_std(int original_stdout, int original_stdin);
 
 // exec ../expansion
 char		*get_var_name(char *retour);
@@ -115,7 +116,8 @@ int			child_process_pipe(t_data *data, t_list *list, t_list_env *env_list,
 				int i);
 void		free_pipes_and_pid(int cmds_numb, t_list *list, pid_t *pid);
 void		check_pipes(int i, t_data *data, t_list *list, int cmds_numb);
-void		ft_close_unused_pipes_for_child(int **pipefd, int cmds_numb, int current_cmd);
+void		ft_close_unused_pipes_for_child(int **pipefd,
+				int cmds_numb, int current_cmd);
 
 // exec../builtin../echo
 void		ft_echo(char **av);
@@ -147,6 +149,11 @@ void		process_single_heredoc(t_data *data, t_list_env *env, int fd);
 char		*get_current_delimiter(t_data *data);
 int			is_last_heredoc(t_data *data);
 t_data		*find_next_heredoc(t_data *current);
+void		here_doc_without_cmd(t_data	*data, t_list_env *env_list,
+				int *flag, t_list *list);
+int			is_delimiter_before(char *args, t_data *data);
+int			is_whitespaces(char *str, int start);
+int			is_delimiter_before2(char *args, t_data *data);
 
 //exec../expand_heredoc
 char		*append_char(char c);
@@ -160,6 +167,7 @@ void		node_creation(t_list *list, char *retour, int *is_quote);
 void		initialisation(t_data *data, char *args, char **env);
 void		initialisation_cmd_numb(t_data *data, t_list *list);
 void		does_word_exist(t_data *data, char *retour, int *is_quote);
+void		add_word_in_node(t_list *list, t_data *data, int *is_quote);
 
 // pars../list_creation
 void		node_creation_env_variables(t_list_env *env_list, char *str);
@@ -191,6 +199,9 @@ int			check_args_error(char *args);
 // pars../dollar_hanling_functions
 void		dollar_pars(t_data *data, char *args, t_list_env *env);
 void		dollar_pars_digit_quote(t_data *data, char *args, t_list_env *env);
+int			skip_whitespace(char *str, int start);
+int			skip_quotes(char *str, int start, char c);
+int			check_after_operator(char *args, int pos);
 
 // pars../get_return_code
 void		return_code(t_data *data, char *args);
@@ -198,7 +209,7 @@ int			check_delim_after_heredoc(t_data *data);
 void		process_heredoc_line(int fd, char *line, t_list_env *env);
 void		handle_signel(int sig);
 int			handle_cmd_execution(t_data *data, t_list *list,
-				t_list_env *env_list);
+				t_list_env *env_list, char **env);
 
 // pars../print_command_error
 int			is_error(char *args);
@@ -212,6 +223,7 @@ void		ft_redir_in(t_data *data);
 int			is_redir_out(t_data *data);
 int			is_redir_out2(t_data *data);
 void		ft_redir_out(t_data *data);
+void		ft_redir_out2(t_data *data);
 int			is_redir_out_append(t_data *data);
 void		ft_redir_out_append(t_data *data);
 
@@ -235,11 +247,14 @@ t_env		*new_env_node(char *str);
 int			is_chevrons(t_data *data);
 int			built_cmd_child(char *str);
 int			built_cmd_parent(char *str);
+void		last_pid_handler(int status);
+void		pids_handler(pid_t *pid, int cmds_numb);
 
 // utils../ft_itoa
 char		*ft_itoa(int n);
 void		ft_char(char number, long i, long nbr, char *str);
 int			ft_length(long n);
+void		reinitialisation_std(int original_stdout, int original_stdin);
 
 // utils../minishell_utils
 int			ft_strchr(char *left_char, char c);
@@ -264,6 +279,8 @@ int			ft_strcmp(char *s1, char *s2);
 //utils../utils_execution
 void		get_file(t_list *list);
 int			is_redirections(t_data *data);
+void		initialisation_cmd_numb(t_data *data, t_list *list);
+int			check_and_handle_here_doc(t_list *list, t_list_env *env_list);
 
 //utils../utils_here_doc
 void		ft_bzero(void *s, int n);
@@ -276,12 +293,19 @@ char		*ft_realloc2(char *expanded, char *retour);
 //utils../utils_here_doc2
 char		*search_in_env(char *expand, t_list_env *env);
 void		exit_clean(int exit_code);
+void		handle_signel(int sig);
+t_data		*find_next_heredoc(t_data *current);
+void		read2(t_data *data, int fd, t_list_env *env);
+
+//utils../utils_heredoc3
+t_data		*find_last_heredoc(t_data *data);
+int			process_all_heredocs(t_data *data, t_list_env *env,
+				t_data *last_heredoc);
+void		cleanup_and_exit(t_data *data, t_list_env *env);
 
 // utils../redirection_checker
 int			search_redir(t_data *data, t_list_env *env);
-int			search_redir_backward(t_data *data, t_list_env *env);
-int			is_redir_start(t_data *data, t_list_env *env, t_list *list);
-int			not_check(t_list *list);
+int			is_last_heredoc(t_data *data);
 
 // utils../syntax_error_token
 int			wrong_token_error(t_data *data, t_list *list);
@@ -297,7 +321,8 @@ int			is_cmd_type(t_data *data);
 int			is_valid_identifier(char *str);
 char		*ft_strndup(char *s, int n);
 int			ft_isalnum(int c);
-
+int			handle_builtin_if_needed(t_data *data, t_list_env *env_list,
+				t_list *list);
 // util../gc
 void		*ft_malloc(long long size);
 char		*ft_gc_strdup(char *s1);
@@ -311,6 +336,15 @@ void		test_builtins_parents(t_data *data, t_list_env *env, t_list *list);
 //utils../utils_execution 
 int			is_redirections(t_data *data);
 void		get_file(t_list *list);
+int			check_and_handle_here_doc(t_list *list, t_list_env *env_list);
+
+//utils../lists_init
+void		initialisation_env_list(t_list_env **env_list);
+void		initialisation_list(t_list **list);
+void		here_doc_without_cmd(t_data	*data, t_list_env *env_list,
+				int *flag, t_list *list);
+void		print_exec(t_list *list, char *args, t_list_env *env_list,
+				char **env);
 
 // signal
 int			signal_handlers(void);
@@ -320,13 +354,12 @@ void		signal_handler(int signum);
 void		main_loop_function(t_list *list, char *args, char **env,
 				t_list_env *env_list);
 int			is_unclosed_quotes(char *args);
-void		initialisation_list(t_list **list);
-void		print_exec(t_list *list, char *args, t_list_env *env_list);
+void		print_exec(t_list *list, char *args, t_list_env *env_list,
+				char **env);
 int			tokenisation_and_exec(t_list *list, char *args,
-				t_list_env *env_list);
+				t_list_env *env_list, char **env);
 void		program_handler(t_list *list, char *args, char **env,
 				t_list_env *env_list);
-void		initialisation_env_list(t_list_env **env_list);
 
 void		here_doc_cmd(t_data *data);
 void		update_existing_env(t_env *existing_node, char *key, char *value);

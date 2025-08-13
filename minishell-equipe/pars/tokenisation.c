@@ -70,7 +70,6 @@ int	is_unclosed_quotes(char *args)
 		}
 		i++;
 	}
-
 	if (in_single_quote || in_double_quote)
 		return (1);
 	return (0);

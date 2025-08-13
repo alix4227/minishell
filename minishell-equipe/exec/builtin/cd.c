@@ -6,7 +6,7 @@
 /*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/24 20:50:12 by hmimouni          #+#    #+#             */
-/*   Updated: 2025/08/02 16:25:00 by acrusoe          ###   ########.fr       */
+/*   Updated: 2025/08/04 18:23:21 by acrusoe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ void	ft_cd(char **args, t_list_env *envp)
 {
 	if (args[1] == NULL)
 		return ;
-	if (args[2] != NULL) 
+	if (args[2] != NULL)
 	{
 		write(2, "cd: too many arguments\n", 23);
 		set_get_exit_status(1);

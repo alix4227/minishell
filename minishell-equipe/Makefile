@@ -61,6 +61,7 @@ SRCS 	=  exec/execution.c\
 			utils/redirection_checker.c\
 			utils/syntax_error_token.c\
 			utils/builtin_utils.c\
+			utils/utils_heredoc3.c\
 			utils/lists_initialisation.c\
 			utils/gc.c\
 			main.c\

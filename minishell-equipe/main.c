@@ -15,77 +15,41 @@
 // void	print_exec(t_list *list, char *args, t_list_env *env_list)
 // {
 // 	t_data	*data;
-// 	int		saved_stdin;
+// 	int		flag;
 
-// 	saved_stdin = dup(STDIN_FILENO);
-// 	if(saved_stdin < 0)
+// 	flag = 0;
+// 	if (!list || !list->begin)
+// 	{
+// 		print_error(list, args);
+// 		return ;
+// 	}
+// 	data = list->begin;
+// 	data->saved_stdin = dup(STDIN_FILENO);
+// 	if (data->saved_stdin < 0)
 // 	{
 // 		perror("dup");
 // 		exit(EXIT_FAILURE);
 // 	}
-// 	data = list->begin;
+// 	if (handle_cmd_execution(data, list, env_list))
+// 		return ;
 // 	while (data)
 // 	{
-// 		if (ft_strcmp(data->type, "CMD") == 0)
+// 		if (ft_strcmp(data->type, "HERE_DOC") == 0)
 // 		{
-// 			exec(list, env_list);
-// 			if (data->here_doc_fd >= 0)
-// 				unlink("here_doc");
-// 			data->here_doc_fd = 0;
-// 			dup2(saved_stdin, STDIN_FILENO);
-// 			close (saved_stdin);
-// 			return ;
+// 			here_doc(data, env_list);
+// 			dup2(list->begin->saved_stdin, STDIN_FILENO);
+// 			close(list->begin->saved_stdin);
+// 			flag = 1;
+// 			break ;
 // 		}
 // 		data = data->next;
 // 	}
-// 	if (list->begin && ft_strcmp(list->begin->type, "HERE_DOC") == 0)
-// 	{
-// 		here_doc(list->begin, env_list);
-// 		dup2(saved_stdin, STDIN_FILENO);
-// 		close(saved_stdin);
-// 	}
-// 	if (!data)
+// 	if (!flag)
 // 		print_error(list, args);
 // }
 
-void	print_exec(t_list *list, char *args, t_list_env *env_list)
-{
-	t_data	*data;
-	int	flag;
-
-	flag = 0;
-	if (!list || !list->begin)
-	{
-		print_error(list, args);
-		return ;
-	}
-	data = list->begin;
-	data->saved_stdin = dup(STDIN_FILENO);
-	if (data->saved_stdin < 0)
-	{
-		perror("dup");
-		exit(EXIT_FAILURE);
-	}
-	if (handle_cmd_execution(data, list, env_list))
-		return ;
-	while (data)
-	{
-		if (ft_strcmp(data->type, "HERE_DOC") == 0)
-		{
-			here_doc(data, env_list);
-			dup2(list->begin->saved_stdin, STDIN_FILENO);
-			close(list->begin->saved_stdin);
-			flag = 1;
-			break;
-		}
-		data = data->next;
-	}
-	if (!flag)
-		print_error(list, args);
-}
-
 int	tokenisation_and_exec(t_list *list, char *args,
-	t_list_env *env_list)
+	t_list_env *env_list, char **env)
 {
 	t_data	*data;
 
@@ -98,7 +62,7 @@ int	tokenisation_and_exec(t_list *list, char *args,
 	initialisation_cmd_numb(data, list);
 	if (!last_pipe_not_followed_by_cmd(data, list))
 		return (0);
-	print_exec(list, args, env_list);
+	print_exec(list, args, env_list, env);
 	pipe_not_followed_by_cmd(data, list);
 	rl_redisplay();
 	signal_handlers();
@@ -118,7 +82,7 @@ void	program_handler(t_list *list, char *args, char **env,
 	if (check_args_error(args))
 		return ;
 	get_word(list, args, data, env_list);
-	if (!tokenisation_and_exec(list, args, env_list))
+	if (!tokenisation_and_exec(list, args, env_list, env))
 	{
 		ft_malloc(-1);
 		signal_handlers();
@@ -130,10 +94,10 @@ void	program_handler(t_list *list, char *args, char **env,
 void	main_loop_function(t_list *list, char *args, char **env,
 						t_list_env *env_list)
 {
-	signal(SIGQUIT, SIG_IGN);
-	signal(SIGTSTP, SIG_IGN);
 	while (1)
 	{
+		signal(SIGTSTP, SIG_IGN);
+		signal(SIGQUIT, SIG_IGN);
 		set_get_env(env_list);
 		initialisation_list(&list);
 		args = readline("\033[1m\033[38;5;129mMinishell → \033[0m");

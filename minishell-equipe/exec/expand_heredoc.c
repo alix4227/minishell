@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   expand_heredoc.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: hmimouni <hmimouni@>                       +#+  +:+       +#+        */
+/*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/25 15:02:35 by hmimouni          #+#    #+#             */
-/*   Updated: 2025/07/29 13:18:23 by hmimouni         ###   ########.fr       */
+/*   Updated: 2025/08/09 11:42:19 by acrusoe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char	*append_str(char *base, char *to_add)
 	return (new);
 }
 
-char	*check_dollar(char *line, int *i, t_list_env *env)
+char	*check_dollar(char *line, int *i, t_list_env *envp)
 {
 	char	*key;
 	char	*out;
@@ -48,13 +48,13 @@ char	*check_dollar(char *line, int *i, t_list_env *env)
 	while (ft_isalnum(line[*i]) || line[*i] == '_')
 		(*i)++;
 	key = ft_substr(line, start, *i - start);
-	out = search_in_env(key, env);
+	out = search_in_env(key, envp);
 	if (!out)
 		return (ft_gc_strdup(""));
 	return (ft_gc_strdup(out));
 }
 
-char	*expand_line(char *line, t_list_env *env)
+char	*expand_line(char *line, t_list_env *envp)
 {
 	char	*result;
 	char	*tmp;
@@ -65,7 +65,7 @@ char	*expand_line(char *line, t_list_env *env)
 	while (line[i])
 	{
 		if (line[i] == '$')
-			tmp = check_dollar(line, &i, env);
+			tmp = check_dollar(line, &i, envp);
 		else
 			tmp = append_char(line[i++]);
 		result = append_str(result, tmp);
@@ -73,7 +73,7 @@ char	*expand_line(char *line, t_list_env *env)
 	return (result);
 }
 
-// char	*expand_line(char *line, t_list_env *env)
+// char	*expand_line(char *line, t_list_envp *envp)
 // {
 // 	int		i;
 // 	int		j;
@@ -109,7 +109,7 @@ char	*expand_line(char *line, t_list_env *env)
 // 			while (ft_isalnum(line[i]))
 // 				i++;
 // 			key = ft_substr(line, start, i - start);
-// 			out = search_in_env(key, env);
+// 			out = search_in_envp(key, envp);
 // 			if (out)
 // 			{
 // 				expanded = ft_realloc2(out, expanded);

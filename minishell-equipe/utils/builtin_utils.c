@@ -6,7 +6,7 @@
 /*   By: hmimouni <hmimouni@>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/28 18:04:41 by hmimouni          #+#    #+#             */
-/*   Updated: 2025/07/29 13:31:30 by hmimouni         ###   ########.fr       */
+/*   Updated: 2025/08/07 14:52:19 by hmimouni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,4 +61,14 @@ char	*ft_strndup(char *s, int n)
 	}
 	dup[i] = '\0';
 	return (dup);
+}
+
+int	handle_builtin_if_needed(t_data *data, t_list_env *env_list, t_list *list)
+{
+	if (built_cmd_parent(data->word))
+	{
+		test_builtins_parents(data, env_list, list);
+		return (1);
+	}
+	return (0);
 }

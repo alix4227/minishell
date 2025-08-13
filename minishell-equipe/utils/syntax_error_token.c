@@ -50,12 +50,16 @@ int	check_file_after_redirout(t_data *data)
 
 int	last_pipe_not_followed_by_cmd(t_data *data, t_list *list)
 {
+	if (!list || !list->end)
+		return (0);
 	data = list->end;
-	while (ft_strcmp(data->word, "") == 0)
+	while (data && data->back && data->word && ft_strcmp(data->word, " ") == 0)
 		data = data->back;
+	if (!data || !data->type)
+		return (0);
 	if (ft_strcmp(data->type, "PIPE") == 0)
 	{
-		printf("bash: command not found\n");
+		printf("bash: syntax error near unexpected token\n");
 		return (0);
 	}
 	return (1);
@@ -70,7 +74,8 @@ void	pipe_not_followed_by_cmd(t_data *data, t_list *list)
 	{
 		if (data->next && ft_strcmp(data->type, "PIPE") == 0)
 		{
-			if (!is_redirections(data->next) && ft_strcmp(data->next->type, "CMD"))
+			if (!is_redirections(data->next)
+				&& ft_strcmp(data->next->type, "CMD"))
 				printf("bash: command not found\n");
 		}
 		data = data->next;
@@ -85,11 +90,6 @@ int	wrong_token_error(t_data *data, t_list *list)
 	if (ft_strcmp(list->begin->type, "PIPE") == 0)
 	{
 		printf("bash: syntax error near unexpected token\n");
-		return (1);
-	}
-	if (ft_strcmp(list->begin->type, "ARG") == 0)
-	{
-		printf("bash: command not found\n");
 		return (1);
 	}
 	while (data)

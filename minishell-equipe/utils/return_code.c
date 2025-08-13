@@ -6,7 +6,7 @@
 /*   By: hmimouni <hmimouni@>                       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/06/22 19:44:03 by hmimouni          #+#    #+#             */
-/*   Updated: 2025/07/30 23:46:21 by hmimouni         ###   ########.fr       */
+/*   Updated: 2025/08/04 17:12:42 by hmimouni         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,22 +73,3 @@ void	test_builtins_parents(t_data *data, t_list_env *env, t_list *list)
 	(void)data;
 	(void)env;
 }
-// int main(void)
-// {
-// 	code = ft_itoa(set_get_exit_status(-1));
-
-// 	int exit_code;
-
-// 	exit_code = set_get_exit_status(-1);
-
-// 	printf("EXIT CODE : [%d]\n", exit_code);
-// 	printf("EXIT CODE : [%d]\n", set_get_exit_status(-1));
-
-// 	set_get_exit_status(130);
-
-// 	exit_code = set_get_exit_status(-1);
-
-// 	printf("\n");
-// 	printf("EXIT CODE : [%d]\n", exit_code);
-// 	printf("EXIT CODE : [%d]\n", set_get_exit_status(-1));
-// }

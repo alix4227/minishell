@@ -21,14 +21,14 @@ void	dollar_pars_digit_quote(t_data *data, char *args, t_list_env *env)
 	if (is_quote(args[data->i - 1]))
 	{
 		while (args[data->i] && !is_quote(args[data->i]))
-		data->retour[data->j++] = args[data->i++];
+			data->retour[data->j++] = args[data->i++];
 		if (args[data->i] == c)
-		data->i++;
+			data->i++;
 		else
 			exit (1);
 	}
 	while (is_digit(args[data->i]))
-	data->i++;
+		data->i++;
 	(void)env;
 }
 
@@ -47,5 +47,31 @@ void	dollar_pars(t_data *data, char *args, t_list_env *env)
 		data->i++;
 	}
 	else
-		expansion(data, args, env);
+	{
+		if (!is_delimiter_before2(args, data))
+			expansion(data, args, env);
+		else
+			data->retour[data->j++] = '$';
+	}
+}
+
+int	skip_whitespace(char *str, int start)
+{
+	while (str[start] && str[start] == ' ')
+		start++;
+	return (start);
+}
+
+int	skip_quotes(char *str, int start, char c)
+{
+	start++;
+	while (str[start] && str[start] != c)
+		start++;
+	return (start);
+}
+
+int	check_after_operator(char *args, int pos)
+{
+	pos = skip_whitespace(args, pos);
+	return (args[pos] == '\0' || is_operator3(args[pos]));
 }

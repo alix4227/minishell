@@ -6,32 +6,11 @@
 /*   By: acrusoe <acrusoe@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/28 13:04:30 by acrusoe           #+#    #+#             */
-/*   Updated: 2025/08/02 14:27:46 by acrusoe          ###   ########.fr       */
+/*   Updated: 2025/08/04 18:28:00 by acrusoe          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
-int	skip_whitespace(char *str, int start)
-{
-	while (str[start] && str[start] == ' ')
-		start++;
-	return (start);
-}
-
-int	skip_quotes(char *str, int start, char c)
-{
-	start++;
-	while (str[start] && str[start] != c)
-		start++;
-	return (start);
-}
-
-int	check_after_operator(char *args, int pos)
-{
-	pos = skip_whitespace(args, pos);
-	return (args[pos] == '\0' || is_operator3(args[pos]));
-}
 
 int	check_after(char *args, int *i)
 {
@@ -54,6 +33,7 @@ int	is_double_operator(const char *s)
 		return (1);
 	return (0);
 }
+
 int	is_redirs(char c)
 {
 	if (c == '>' || c == '<')
